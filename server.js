@@ -41,7 +41,6 @@ MongoClient.connect('mongodb://localhost:27017/urls', (err, db) => {
                      console.log(err);
                      res.end(`Link doesn't exist`);
                  }
-                 console.log(docs);
                  res.redirect(docs[0].longUrl);
               });
         });
