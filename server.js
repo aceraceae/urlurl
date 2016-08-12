@@ -32,13 +32,13 @@ MongoClient.connect('mongodb://localhost:27017/urls', (err, db) => {
     });
 
     app.get('/:short', (req, res) => {
-        //get url from db;
+
         const queryUrl = req.params.short;
-        console.log(queryUrl);
+
         col.createIndex('random', { w:1, background: true, sparse: true, unique: true }, (err, idx) => {
 
              if(err) { console.log(err); }
-
+            //get url from db;
              col.find({"random":queryUrl}).toArray((err, docs) => {
                    if(err) {
                      console.log(err);
@@ -58,10 +58,12 @@ MongoClient.connect('mongodb://localhost:27017/urls', (err, db) => {
 
     app.get('/new/:long', (req, res) => {
         const queryUrl = req.params.long.slice(1);
-        //post new url to db;
         if(validUrl.isUri(queryUrl)) {
+                //post new url to db;
             col.insertOne(handleDb.postUrl(queryUrl, req.headers.host, req.secure), (err, result) => {
+
                 if(err) { console.error(err); }
+
                 const link = result.ops[0];
                 res.json({"longUrl": link.longUrl, "shortUrl": link.shortUrl});
             });

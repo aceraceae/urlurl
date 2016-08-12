@@ -11,7 +11,7 @@ It will redirect you to the original link.\n
 Note:
 \t You should give vaild url, that means - with protocol specified ("http://" or "https://").`;
     },
-    
+
   error(type) {
       const messages = ["Link doesn't exist", "Invalid URL"];
       return {"error": messages[type]};
