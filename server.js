@@ -19,7 +19,7 @@ app.use(mid.favicon);
 app.use(mid.matchUrl);
 
 
-MongoClient.connect('mongodb://localhost:27017/urls', (err, db) => {
+MongoClient.connect(process.env.MONGODB_URI, (err, db) => {
     if(err) {
         console.error(err);
     }
