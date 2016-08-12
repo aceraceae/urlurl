@@ -10,11 +10,13 @@ const MongoClient = require('mongodb').MongoClient;
 
 // custom modules
 const handleDb = require('./db-handler.js');
-const matchUrl = require('./middlewares.js');
+const mid = require('./middlewares.js');
+const message = require('./messages.js');
 
 // apply middlewares
 app.use(express.static(path.resolve(__dirname)));
-app.use(matchUrl);
+app.use(mid.favicon);
+app.use(mid.matchUrl);
 
 
 MongoClient.connect('mongodb://localhost:27017/urls', (err, db) => {
@@ -25,23 +27,30 @@ MongoClient.connect('mongodb://localhost:27017/urls', (err, db) => {
 
     app.get('/', (req,res) => {
         res.writeHead(200, {"Content-Type": "text/json"});
-        res.end(`Welcome`);
+        const prepend = `${req.secure?"https":"http"}://${req.headers.host}/`;
+        res.end(message.welcome(prepend));
     });
 
     app.get('/:short', (req, res) => {
         //get url from db;
         const queryUrl = req.params.short;
-        const opts = { w:1, background: true, sparse: true, unique: true };
-        col.createIndex('random', opts, (err, idx) => {
+        console.log(queryUrl);
+        col.createIndex('random', { w:1, background: true, sparse: true, unique: true }, (err, idx) => {
 
              if(err) { console.log(err); }
 
              col.find({"random":queryUrl}).toArray((err, docs) => {
                    if(err) {
                      console.log(err);
-                     res.end(`Link doesn't exist`);
                  }
-                 res.redirect(docs[0].longUrl);
+
+                 if(docs[0]) {
+                     res.redirect(docs[0].longUrl);
+                 } else {
+                     res.json(message.error(0));
+                 }
+
+
               });
         });
 
@@ -58,7 +67,7 @@ MongoClient.connect('mongodb://localhost:27017/urls', (err, db) => {
             });
 
         } else {
-            res.end(`Invalid URL`);
+            res.json(message.error(1));
         }
     });
 
